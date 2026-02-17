@@ -20,22 +20,27 @@ taggable_resources := {
   "aws_cloudwatch_log_group",
 }
 
+# Helper to check if resource is being deleted
+is_delete(resource) {
+  resource.change.actions[_] == "delete"
+}
+
 # Deny resources that are missing required tags
 deny[msg] {
   resource := input.terraform.resource_changes[_]
   taggable_resources[resource.type]
-
-  # Skip resources being deleted
-  not resource.change.actions[_] == "delete"
+  not is_delete(resource)
 
   # Get all tags (check both tags and tags_all)
   tags := object.get(resource.change.after, "tags", {})
   tags_all := object.get(resource.change.after, "tags_all", {})
   all_tags := object.union(tags, tags_all)
 
-  # Find missing required tags
-  missing := [tag | tag := required_tags[_]; not all_tags[tag]]
-  count(missing) > 0
+  # Check for missing tags
+  tag := required_tags[_]
+  not all_tags[tag]
+
+  missing := [t | t := required_tags[_]; not all_tags[t]]
 
   msg := sprintf(
     "Resource '%s' is missing required tags: %v. All resources must have: %v",
