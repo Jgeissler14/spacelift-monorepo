@@ -177,3 +177,9 @@ variable "existing_frontend_ecr_repository_url" {
   type        = string
   description = "Existing frontend ECR repository URL (required)."
 }
+
+variable "default_tags" {
+  type        = map(string)
+  default     = {}
+  description = "Default tags to apply to all taggable resources."
+}

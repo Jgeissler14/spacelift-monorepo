@@ -37,6 +37,8 @@ resource "aws_security_group" "alb" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = var.default_tags
 }
 
 resource "aws_security_group" "ecs_tasks" {
@@ -64,6 +66,8 @@ resource "aws_security_group" "ecs_tasks" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = var.default_tags
 }
 
 resource "aws_lb" "this" {
@@ -73,6 +77,7 @@ resource "aws_lb" "this" {
   subnets                    = length(var.alb_subnet_ids) > 0 ? var.alb_subnet_ids : var.public_subnet_ids
   security_groups            = [aws_security_group.alb.id]
   enable_deletion_protection = true
+  tags                       = var.default_tags
 }
 
 resource "aws_lb_target_group" "frontend" {
@@ -90,6 +95,8 @@ resource "aws_lb_target_group" "frontend" {
     healthy_threshold   = 2
     unhealthy_threshold = 5
   }
+
+  tags = var.default_tags
 }
 
 resource "aws_lb_target_group" "backend" {
@@ -107,6 +114,8 @@ resource "aws_lb_target_group" "backend" {
     healthy_threshold   = 2
     unhealthy_threshold = 5
   }
+
+  tags = var.default_tags
 }
 
 resource "aws_lb_listener" "http" {

@@ -1,16 +1,19 @@
 resource "aws_ecs_cluster" "this" {
   count = var.create_cluster ? 1 : 0
   name  = var.project_name
+  tags  = var.default_tags
 }
 
 resource "aws_cloudwatch_log_group" "backend" {
   name              = "/ecs/${var.project_name}/backend"
   retention_in_days = 30
+  tags              = var.default_tags
 }
 
 resource "aws_cloudwatch_log_group" "frontend" {
   name              = "/ecs/${var.project_name}/frontend"
   retention_in_days = 30
+  tags              = var.default_tags
 }
 
 locals {
@@ -123,6 +126,8 @@ resource "aws_ecs_service" "backend" {
     container_port   = 8000
   }
 
+  tags = var.default_tags
+
   depends_on = [aws_lb_listener.http, aws_lb_listener.http_redirect, aws_lb_listener.https, aws_lb_listener.backend_http]
 }
 
@@ -146,6 +151,8 @@ resource "aws_ecs_service" "frontend" {
     container_name   = "frontend"
     container_port   = 8080
   }
+
+  tags = var.default_tags
 
   depends_on = [aws_lb_listener.http, aws_lb_listener.http_redirect, aws_lb_listener.https, aws_lb_listener.backend_http]
 }
