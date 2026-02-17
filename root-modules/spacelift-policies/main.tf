@@ -114,21 +114,5 @@ resource "spacelift_policy_attachment" "bad_cost" {
   stack_id  = spacelift_stack.neo4j_web_bad.id
 }
 
-# Optional: Attach AWS integration to stacks (if provided)
-resource "spacelift_aws_integration_attachment" "good" {
-  count = var.aws_integration_id != "" ? 1 : 0
-
-  integration_id = var.aws_integration_id
-  stack_id       = spacelift_stack.neo4j_web_good.id
-  read           = true
-  write          = true
-}
-
-resource "spacelift_aws_integration_attachment" "bad" {
-  count = var.aws_integration_id != "" ? 1 : 0
-
-  integration_id = var.aws_integration_id
-  stack_id       = spacelift_stack.neo4j_web_bad.id
-  read           = true
-  write          = true
-}
+# AWS integration is attached manually in Spacelift UI
+# No need to manage via Terraform
