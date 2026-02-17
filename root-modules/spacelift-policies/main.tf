@@ -28,91 +28,92 @@ resource "spacelift_policy" "cost_control" {
   labels = ["cost", "optimization"]
 }
 
-# Create infrastructure stacks
-resource "spacelift_stack" "neo4j_web_good" {
-  name         = "neo4j-web-customer-good"
+# Create locals for dynamic stack generation
+locals {
+  # Flatten root modules and tfvars into individual stacks
+  stacks = merge([
+    for module_name, module_config in var.root_modules : {
+      for tfvars_file in module_config.tfvars_files :
+      "${module_name}-${replace(tfvars_file, ".tfvars", "")}" => {
+        module_name  = module_name
+        project_root = module_config.project_root
+        tfvars_file  = tfvars_file
+      }
+    }
+  ]...)
+
+  # Create policy list for dynamic attachment
+  policies = {
+    required_tags = spacelift_policy.required_tags.id
+    security      = spacelift_policy.security.id
+    cost_control  = spacelift_policy.cost_control.id
+  }
+
+  # Create policy-stack attachment combinations
+  policy_attachments = merge([
+    for stack_key, stack_config in local.stacks : {
+      for policy_name, policy_id in local.policies :
+      "${stack_key}-${policy_name}" => {
+        policy_id = policy_id
+        stack_id  = spacelift_stack.infrastructure[stack_key].id
+      }
+    }
+  ]...)
+}
+
+# Dynamically create stacks based on root modules and tfvars
+resource "spacelift_stack" "infrastructure" {
+  for_each = local.stacks
+
+  name         = each.key
   repository   = "spacelift-monorepo"
   branch       = "main"
-  project_root = "root-modules/neo4j-web"
+  project_root = each.value.project_root
 
   terraform_workflow_tool = "OPEN_TOFU"
   terraform_version       = "1.11.5"
   administrative          = false
   autodeploy              = false
 
-  labels = ["neo4j", "production", "customer", "opentofu"]
+  labels = [
+    each.value.module_name,
+    replace(each.value.tfvars_file, ".tfvars", ""),
+    "opentofu",
+    "managed-by-terraform"
+  ]
 }
 
-resource "spacelift_stack" "neo4j_web_bad" {
-  name         = "neo4j-web-customer-bad"
-  repository   = "spacelift-monorepo"
-  branch       = "main"
-  project_root = "root-modules/neo4j-web"
+# Environment variables for each stack (tfvars file)
+resource "spacelift_environment_variable" "tfvars_plan" {
+  for_each = local.stacks
 
-  terraform_workflow_tool = "OPEN_TOFU"
-  terraform_version       = "1.11.5"
-  administrative          = false
-  autodeploy              = false
-
-  labels = ["neo4j", "demo", "customer", "opentofu"]
-}
-
-# Environment variables for customer-good stack
-resource "spacelift_environment_variable" "good_tfvars_plan" {
-  stack_id = spacelift_stack.neo4j_web_good.id
+  stack_id = spacelift_stack.infrastructure[each.key].id
   name     = "TF_CLI_ARGS_plan"
-  value    = "-var-file=tfvars/customer-good.tfvars"
+  value    = "-var-file=tfvars/${each.value.tfvars_file}"
 }
 
-resource "spacelift_environment_variable" "good_tfvars_apply" {
-  stack_id = spacelift_stack.neo4j_web_good.id
+resource "spacelift_environment_variable" "tfvars_apply" {
+  for_each = local.stacks
+
+  stack_id = spacelift_stack.infrastructure[each.key].id
   name     = "TF_CLI_ARGS_apply"
-  value    = "-var-file=tfvars/customer-good.tfvars"
+  value    = "-var-file=tfvars/${each.value.tfvars_file}"
 }
 
-# Environment variables for customer-bad stack
-resource "spacelift_environment_variable" "bad_tfvars_plan" {
-  stack_id = spacelift_stack.neo4j_web_bad.id
-  name     = "TF_CLI_ARGS_plan"
-  value    = "-var-file=tfvars/customer-bad.tfvars"
+# Attach all policies to all stacks
+resource "spacelift_policy_attachment" "stacks" {
+  for_each = local.policy_attachments
+
+  policy_id = each.value.policy_id
+  stack_id  = each.value.stack_id
 }
 
-resource "spacelift_environment_variable" "bad_tfvars_apply" {
-  stack_id = spacelift_stack.neo4j_web_bad.id
-  name     = "TF_CLI_ARGS_apply"
-  value    = "-var-file=tfvars/customer-bad.tfvars"
-}
+# Attach AWS integration to all stacks
+resource "spacelift_aws_integration_attachment" "stacks" {
+  for_each = local.stacks
 
-# Attach policies to both stacks
-resource "spacelift_policy_attachment" "good_required_tags" {
-  policy_id = spacelift_policy.required_tags.id
-  stack_id  = spacelift_stack.neo4j_web_good.id
+  integration_id = var.aws_integration_id
+  stack_id       = spacelift_stack.infrastructure[each.key].id
+  read           = true
+  write          = true
 }
-
-resource "spacelift_policy_attachment" "good_security" {
-  policy_id = spacelift_policy.security.id
-  stack_id  = spacelift_stack.neo4j_web_good.id
-}
-
-resource "spacelift_policy_attachment" "good_cost" {
-  policy_id = spacelift_policy.cost_control.id
-  stack_id  = spacelift_stack.neo4j_web_good.id
-}
-
-resource "spacelift_policy_attachment" "bad_required_tags" {
-  policy_id = spacelift_policy.required_tags.id
-  stack_id  = spacelift_stack.neo4j_web_bad.id
-}
-
-resource "spacelift_policy_attachment" "bad_security" {
-  policy_id = spacelift_policy.security.id
-  stack_id  = spacelift_stack.neo4j_web_bad.id
-}
-
-resource "spacelift_policy_attachment" "bad_cost" {
-  policy_id = spacelift_policy.cost_control.id
-  stack_id  = spacelift_stack.neo4j_web_bad.id
-}
-
-# AWS integration is attached manually in Spacelift UI
-# No need to manage via Terraform
