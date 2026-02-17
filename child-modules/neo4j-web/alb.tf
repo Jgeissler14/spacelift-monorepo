@@ -67,10 +67,11 @@ resource "aws_security_group" "ecs_tasks" {
 }
 
 resource "aws_lb" "this" {
-  name               = var.project_name
-  load_balancer_type = "application"
-  subnets            = length(var.alb_subnet_ids) > 0 ? var.alb_subnet_ids : var.public_subnet_ids
-  security_groups    = [aws_security_group.alb.id]
+  name                       = var.project_name
+  load_balancer_type         = "application"
+  subnets                    = length(var.alb_subnet_ids) > 0 ? var.alb_subnet_ids : var.public_subnet_ids
+  security_groups            = [aws_security_group.alb.id]
+  enable_deletion_protection = true
 }
 
 resource "aws_lb_target_group" "frontend" {
