@@ -27,10 +27,10 @@ backend_env = {
 
 # Secrets from AWS Secrets Manager
 backend_secrets = {
-  NEO4J_PASSWORD                     = "arn:aws:secretsmanager:us-east-1:203918842750:secret:acme-neo4j/password-AbCdEf"
-  LLM_MODEL_CONFIG_OPENAI_GPT_5_MINI = "arn:aws:secretsmanager:us-east-1:203918842750:secret:acme-neo4j/openai-config-mini-GhIjKl"
-  LLM_MODEL_CONFIG_OPENAI_GPT_5_2    = "arn:aws:secretsmanager:us-east-1:203918842750:secret:acme-neo4j/openai-config-gpt52-MnOpQr"
-  OPENAI_API_KEY                     = "arn:aws:secretsmanager:us-east-1:203918842750:secret:acme-neo4j/openai-key-StUvWx"
+  NEO4J_PASSWORD                     = "arn:aws:secretsmanager:us-east-1:203918842750:secret:colossus-knowledge-manager/neo4j-password-J6tUHp"
+  LLM_MODEL_CONFIG_OPENAI_GPT_5_MINI = "arn:aws:secretsmanager:us-east-1:203918842750:secret:colossus-knowledge-manager/openai-model-config-gwiymS"
+  LLM_MODEL_CONFIG_OPENAI_GPT_5_2    = "arn:aws:secretsmanager:us-east-1:203918842750:secret:colossus-knowledge-manager/openai-model-config-gpt52-rl1g2T"
+  OPENAI_API_KEY                     = "arn:aws:secretsmanager:us-east-1:203918842750:secret:colossus-knowledge-manager/openai-api-key-QPoFDq"
 }
 
 # Required tags for governance and cost tracking
