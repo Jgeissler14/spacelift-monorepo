@@ -28,19 +28,15 @@ resource "spacelift_policy" "cost_control" {
   labels = ["cost", "optimization"]
 }
 
+# Automatically discover root modules and tfvars files
+data "external" "discover_stacks" {
+  program = ["${path.module}/scripts/discover-stacks.sh"]
+}
+
 # Create locals for dynamic stack generation
 locals {
-  # Flatten root modules and tfvars into individual stacks
-  stacks = merge([
-    for module_name, module_config in var.root_modules : {
-      for tfvars_file in module_config.tfvars_files :
-      "${module_name}-${replace(tfvars_file, ".tfvars", "")}" => {
-        module_name  = module_name
-        project_root = module_config.project_root
-        tfvars_file  = tfvars_file
-      }
-    }
-  ]...)
+  # Parse discovered stacks
+  stacks = jsondecode(data.external.discover_stacks.result.stacks)
 
   # Create policy list for dynamic attachment
   policies = {
@@ -61,7 +57,7 @@ locals {
   ]...)
 }
 
-# Dynamically create stacks based on root modules and tfvars
+# Dynamically create stacks based on discovered modules and tfvars
 resource "spacelift_stack" "infrastructure" {
   for_each = local.stacks
 
@@ -79,7 +75,7 @@ resource "spacelift_stack" "infrastructure" {
     each.value.module_name,
     replace(each.value.tfvars_file, ".tfvars", ""),
     "opentofu",
-    "managed-by-terraform"
+    "auto-discovered"
   ]
 }
 
