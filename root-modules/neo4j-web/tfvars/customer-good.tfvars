@@ -2,11 +2,12 @@
 
 project_name = "acme-neo4j-prod"
 
-# HTTPS Configuration - Best practice
-acm_certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/abcd1234-5678-90ab-cdef-EXAMPLE11111"
-frontend_domain     = "graph.acme.com"
-backend_domain      = "graph-api.acme.com"
-route53_zone_id     = "Z1234567890ABC"
+# HTTPS Configuration - Best practice (commented out for demo)
+# To enable HTTPS, provide a real ACM certificate:
+# acm_certificate_arn = "arn:aws:acm:us-east-1:YOUR_ACCOUNT:certificate/YOUR_CERT"
+# frontend_domain     = "graph.acme.com"
+# backend_domain      = "graph-api.acme.com"
+# route53_zone_id     = "Z1234567890ABC"
 
 # High Availability - 2+ instances
 frontend_desired_count = 2
