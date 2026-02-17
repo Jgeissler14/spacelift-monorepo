@@ -69,7 +69,7 @@ resource "spacelift_stack" "infrastructure" {
   terraform_workflow_tool = "OPEN_TOFU"
   terraform_version       = "1.11.5"
   administrative          = false
-  autodeploy              = false
+  autodeploy              = true
 
   labels = [
     each.value.module_name,
