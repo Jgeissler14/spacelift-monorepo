@@ -7,13 +7,18 @@ region = "us-east-1"
 existing_backend_ecr_repository_url  = "203918842750.dkr.ecr.us-east-1.amazonaws.com/colossus-knowledge-manager-backend"
 existing_frontend_ecr_repository_url = "203918842750.dkr.ecr.us-east-1.amazonaws.com/colossus-knowledge-manager-frontend"
 
-# VPC Configuration (replace with your actual VPC)
-vpc_id = "vpc-0123456789abcdef0" # TODO: Replace with actual VPC ID
+# VPC Configuration - Neo4j VPC
+vpc_id = "vpc-0ea18145b731d1c29" # neo4j-vpc-internal-dev
 
-# Subnets (replace with your actual subnet IDs)
-# For Fargate, tasks can run in public subnets with public IPs
-public_subnet_ids  = ["subnet-0123456789abcdef0", "subnet-0123456789abcdef1"]
-private_subnet_ids = ["subnet-0fedcba9876543210", "subnet-0fedcba9876543211"]
+# Subnets - ALB in public, ECS tasks in private for security
+public_subnet_ids = [
+  "subnet-0b096dd0c323cd9ca", # neo4j-public-subnet-internal-dev-us-east-1a
+  "subnet-07ef5b2e3992c8280"  # neo4j-public-subnet-internal-dev-us-east-1b
+]
+private_subnet_ids = [
+  "subnet-0e965b7f5e047f615", # neo4j-private-subnet-internal-dev-us-east-1a
+  "subnet-0e0059a99f6e406ea"  # neo4j-private-subnet-internal-dev-us-east-1b
+]
 
 # Default ECS configuration
 frontend_task_cpu    = 512
