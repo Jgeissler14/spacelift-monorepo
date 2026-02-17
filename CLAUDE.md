@@ -103,12 +103,12 @@ Documentation is injected into README.md files between markers:
 **Child Modules:**
 - Use minimum version constraints to maximize compatibility
 - Example: `required_version = ">= 1.3"` and `version = ">= 3.0"`
-- Allows root modules to choose their own versions
+- Allows root modules to choose their own OpenTofu/Terraform versions
 
 **Root Modules:**
-- Use exact Terraform version for consistency
+- Use exact OpenTofu version for consistency
 - Use pessimistic operator (`~>`) for providers to allow patch updates
-- Example: `required_version = "1.13.3"` and `version = "~> 3.7.2"`
+- Example: `required_version = "1.11.5"` and `version = "~> 3.7.2"`
 
 ### Module Sourcing
 

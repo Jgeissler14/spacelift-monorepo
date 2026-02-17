@@ -1,0 +1,8 @@
+# Example variables for Spacelift administrative stack
+# Copy to terraform.tfvars and fill in your values
+
+# Your GitHub username or organization
+github_namespace = "yourorg"
+
+# Optional: Spacelift AWS integration ID (found in Spacelift UI under Integrations)
+# aws_integration_id = "01HXXXXXXXXXXXXXXXXXXXXXXX"

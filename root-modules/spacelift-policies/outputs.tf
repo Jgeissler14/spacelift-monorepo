@@ -33,3 +33,19 @@ output "policy_summary" {
   }
   description = "Summary of all created policies"
 }
+
+output "stack_ids" {
+  value = {
+    customer_good = spacelift_stack.neo4j_web_good.id
+    customer_bad  = spacelift_stack.neo4j_web_bad.id
+  }
+  description = "IDs of created stacks"
+}
+
+output "stack_urls" {
+  value = {
+    customer_good = "https://app.spacelift.io/stack/${spacelift_stack.neo4j_web_good.id}"
+    customer_bad  = "https://app.spacelift.io/stack/${spacelift_stack.neo4j_web_bad.id}"
+  }
+  description = "URLs to view stacks in Spacelift UI"
+}

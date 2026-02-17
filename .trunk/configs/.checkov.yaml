@@ -1,2 +1,0 @@
-skip-check:
-  - CKV_TF_1 # Ensure module references are pinned to a commit SHA.
