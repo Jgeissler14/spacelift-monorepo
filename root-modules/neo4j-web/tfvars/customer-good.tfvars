@@ -15,8 +15,10 @@ backend_desired_count  = 2
 
 # Environment variables for frontend (nginx template)
 frontend_env = {
-  VITE_BACKEND_API_URL  = "http://acme-neo4j-prod-320965403.us-east-1.elb.amazonaws.com:8000"
-  VITE_SEGMENT_API_URL  = ""  # Optional analytics - empty for demo
+  AUT0_DOMAIN              = "-"
+  VITE_BACKEND_API_URL     = "http://acme-neo4j-prod-320965403.us-east-1.elb.amazonaws.com:8000"
+  VITE_FRONTEND_HOSTNAME   = "-"
+  VITE_SEGMENT_API_URL     = "-"
 }
 
 # Environment variables for backend (Neo4j connection)
