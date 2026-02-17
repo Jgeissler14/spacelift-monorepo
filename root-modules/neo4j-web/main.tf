@@ -37,4 +37,6 @@ module "neo4j_web" {
 
   existing_backend_ecr_repository_url  = var.existing_backend_ecr_repository_url
   existing_frontend_ecr_repository_url = var.existing_frontend_ecr_repository_url
+
+  default_tags = var.default_tags
 }
