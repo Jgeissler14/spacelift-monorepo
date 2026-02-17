@@ -11,9 +11,9 @@ deny[msg] {
 
   # Count HTTPS listeners
   https_listeners := [listener |
-    listener := input.terraform.resource_changes[_]
-    listener.type == "aws_lb_listener"
-    listener.change.actions[_] != "delete"
+    listener := input.terraform.resource_changes[_];
+    listener.type == "aws_lb_listener";
+    listener.change.actions[_] != "delete";
     listener.change.after.protocol == "HTTPS"
   ]
 
@@ -32,7 +32,8 @@ warn[msg] {
   sg.change.actions[_] != "delete"
 
   rule := sg.change.after.ingress[_]
-  "0.0.0.0/0" in rule.cidr_blocks
+  cidr := rule.cidr_blocks[_]
+  cidr == "0.0.0.0/0"
 
   # Allow 80 and 443 for ALBs, but warn about other ports
   not rule.from_port == 80

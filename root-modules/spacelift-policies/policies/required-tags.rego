@@ -23,7 +23,7 @@ taggable_resources := {
 # Deny resources that are missing required tags
 deny[msg] {
   resource := input.terraform.resource_changes[_]
-  resource.type in taggable_resources
+  taggable_resources[resource.type]
 
   # Skip resources being deleted
   not resource.change.actions[_] == "delete"
