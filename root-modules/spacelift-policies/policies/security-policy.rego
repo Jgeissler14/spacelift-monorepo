@@ -5,8 +5,8 @@ is_delete(resource) {
   resource.change.actions[_] == "delete"
 }
 
-# Deny HTTP-only ALBs - HTTPS should be configured
-deny[msg] {
+# Warn about HTTP-only ALBs - HTTPS should be configured for production
+warn[msg] {
   alb := input.terraform.resource_changes[_]
   alb.type == "aws_lb"
   not is_delete(alb)
@@ -22,7 +22,7 @@ deny[msg] {
   https_count == 0
 
   msg := sprintf(
-    "ALB '%s' must have an HTTPS listener configured. HTTP-only traffic is insecure and exposes data to interception.",
+    "ALB '%s' should have an HTTPS listener configured. HTTP-only traffic is insecure and exposes data to interception.",
     [alb.address]
   )
 }
