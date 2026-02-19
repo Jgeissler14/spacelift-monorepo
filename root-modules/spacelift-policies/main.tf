@@ -70,7 +70,6 @@ resource "spacelift_stack" "infrastructure" {
   terraform_version       = "1.11.5"
   administrative          = false
   autodeploy              = true
-
   labels = [
     each.value.module_name,
     replace(each.value.tfvars_file, ".tfvars", ""),
